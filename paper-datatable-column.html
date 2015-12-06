@@ -1,3 +1,7 @@
+
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-item/paper-checkbox-item.html">
+
 <script src="../whenever.js/whenever.js"></script>
 <dom-module id="paper-datatable-column">
 	<template>
@@ -16,6 +20,15 @@
 		</template>
 		<template id="editableBooleanTemplate">
 			<paper-checkbox checked="{{value}}"></paper-checkbox>
+		</template>
+		<template id="editableArrayTemplate">
+			<paper-dropdown-menu ignore-select no-label-float>
+				<paper-listbox class="dropdown-content" multi attr-for-selected="value" selected-values="{{value}}" selected-attribute="active">
+					<template is="dom-repeat" items="[[data]]">
+						<paper-checkbox-item value="{{item}}">{{item}}</paper-checkbox-item>
+					</template>
+				</paper-listbox>
+			</paper-dropdown-menu>
 		</template>
 	</template>
 
@@ -61,6 +74,17 @@ Styling
 					 * @required
 					 */
 					header: String,
+					/**
+					 * Array of objects that can be selected from
+					 *
+					 * @attribute data
+					 * @type Array
+					 * @required
+					 */
+					data: {
+						type: Array,
+						notify: true
+					},
 					/**
 					 * The property to be used from `data` for this column
 					 *
@@ -246,14 +270,16 @@ Styling
 				ready: function() {
 
 					var template = Polymer.dom(this).querySelector('template');
-					if(!template && this.type.toLowerCase() == "array"){
-						var template = this.$.arrayTemplate;
+					if(!template && !this.editable && this.type.toLowerCase() == "array"){
+						template = this.$.arrayTemplate;
 					}else if(!template && this.editable && this.type.toLowerCase() == "string"){
-						var template = this.$.editableInputTemplate;
+						template = this.$.editableInputTemplate;
 					}else if(!template && this.editable && this.type.toLowerCase() == "number"){
-						var template = this.$.editableInputTemplate;
+						template = this.$.editableInputTemplate;
 					}else if(!template && this.editable && this.type.toLowerCase() == "boolean"){
-						var template = this.$.editableBooleanTemplate;
+						template = this.$.editableBooleanTemplate;
+					}else if(!template && this.editable && this.type.toLowerCase() == "array"){
+						template = this.$.editableArrayTemplate;
 					}
 
 					if(template) {
